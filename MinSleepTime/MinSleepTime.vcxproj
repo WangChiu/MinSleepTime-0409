@@ -115,12 +115,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Cluster.cpp" />
     <ClCompile Include="Components.cpp" />
     <ClCompile Include="Point.cpp" />
     <ClCompile Include="Sink.cpp" />
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Cluster.h" />
     <ClInclude Include="Components.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="Sink.h" />

@@ -19,14 +19,6 @@ class Main {
 private:
 	vector<Point*>points;
 	vector<Sink*>sinks;
-	typedef struct cluster {
-		vector<Sink*>sinks;
-		vector<Point*>points;
-		double Total_consumption1;
-		double Total_consumption2;
-	}Cluster;
-	Cluster g;
-	//vector<cluster>group;
 	vector<vector<Sink*>>groups1;
 	vector<vector<Sink*>>groups2;
 	int WCVnum = 0;
@@ -36,7 +28,7 @@ private:
 	int *budget;
 public:
 	Main(const char *argv, const char *argv2) {
-		int temp = 101000;
+		int temp = 120000;
 		double test = 0;
 		double limit = 6;
 		this->budget = &temp;
@@ -45,34 +37,57 @@ public:
 		read_TopofileSink(argv);
 		BUY_Device(*budget, limit);
 		sort(sinks.begin(),sinks.end(),sort_consumption1);
-		//g.sinks.push_back();
+		
 		for (int i = 0; i < sinks.size(); i++) {
-			
-			Sink* closeSink = sinks.at(0);
-			double temp = 9999999999999999;
-			if (sinks.at(i)->revise_Totaltype1_consumption() >= 43200) break;
-			for (int j = 1; j < sinks.size(); j++) {
-				double temp_s= sqrt(pow(sinks.at(i)->get_location(0) - sinks.at(j)->get_location(0), 2) + pow(sinks.at(i)->get_location(1) - sinks.at(j)->get_location(1), 2));
-				if (temp_s < temp) {
-					temp = temp_s;
-					closeSink = sinks.at(j);
-				}
-			}
-			//groups1.push_back(sinks.at(i));
-		}
-		/*for (int i = 0; i < sinks.size(); i++) {
 			vector<Sink*>temp;
 			temp.push_back(sinks.at(i));
 			groups1.push_back(temp);
-		}*/
+		}
+		while (groups1.size() > WCVnum) {
+			if (groups1.size() <= WCVnum  )break;
+			Sink* closeSink = groups1.at(0).at(0);
+			double temp = 10e10;
+			int count = 0;
+			for (int j = 1; j < groups1.size(); j++) {
+				double temp_s = sqrt(pow(groups1.at(0).at(0)->get_location(0) - groups1.at(j).at(0)->get_location(0), 2) + pow(groups1.at(0).at(0)->get_location(1) - groups1.at(j).at(0)->get_location(1), 2));
+				if (temp_s < temp) {
+					temp = temp_s;
+					closeSink = groups1.at(j).at(0);
+					count = j;
+				}
+			}
+			groups1.at(0).push_back(closeSink);
+			groups1.erase(groups1.begin()+count);
+			sort(groups1.begin(),groups1.end(), sort_groups1);
+		}
+		
 		sort(sinks.begin(), sinks.end(), sort_consumption2);
-		/*for (int i = 0; i < sinks.size(); i++) {
+		for (int i = 0; i < sinks.size(); i++) {
 			vector<Sink*>temp;
 			temp.push_back(sinks.at(i));
 			groups2.push_back(temp);
-		}*/
-		
-		double groups_consumption1=7200*6;
+		}
+		while (groups2.size() > UAVnum) {
+			if (groups2.size() <= UAVnum)break;
+			Sink* closeSink = groups2.at(0).at(0);
+			double temp = 10e10;
+			int count = 0;
+			for (int j = 1; j < groups2.size(); j++) {
+				double temp_s = sqrt(pow(groups2.at(0).at(0)->get_location(0) - groups2.at(j).at(0)->get_location(0), 2) + pow(groups2.at(0).at(0)->get_location(1) - groups2.at(j).at(0)->get_location(1), 2));
+				if (temp_s < temp) {
+					temp = temp_s;
+					closeSink = groups2.at(j).at(0);
+					count = j;
+				}
+			}
+			groups2.at(0).push_back(closeSink);
+			groups2.erase(groups2.begin() + count);
+			sort(groups2.begin(), groups2.end(), sort_groups2);
+		}
+		for (int i = 0; i < groups1.size(); i++) {
+			for(int j=0;j<)
+		}
+  		double groups_consumption1=7200*6;
 		double groups_consumption2=7200*6;
 		for (int i = 0; i < groups1.size(); i++) {
 			for (int j = 0; j < groups1.size(); j++) {
@@ -113,7 +128,28 @@ public:
 	static bool sort_consumption2(Sink* a, Sink* b) {
 		return a->revise_Totaltype2_consumption() < b->revise_Totaltype2_consumption();
 	}
-	
+	static bool sort_groups1(vector<Sink*>a,vector<Sink*>b) {
+		double temp = 0;
+		double temp_s = 0;
+		for (int i = 0; i < a.size(); i++) {
+			temp += a.at(i)->revise_Totaltype1_consumption();
+		}
+		for (int i = 0; i < b.size(); i++) {
+			temp_s += b.at(i)->revise_Totaltype1_consumption();
+		}
+		return temp < temp_s;
+	}
+	static bool sort_groups2(vector<Sink*>a, vector<Sink*>b) {
+		double temp = 0;
+		double temp_s = 0;
+		for (int i = 0; i < a.size(); i++) {
+			temp += a.at(i)->revise_Totaltype2_consumption();
+		}
+		for (int i = 0; i < b.size(); i++) {
+			temp_s += b.at(i)->revise_Totaltype2_consumption();
+		}
+		return temp < temp_s;
+	}
 	void belong() {
 		for (int i = 0; i < points.size(); i++) {
 			double temp = sqrt(pow(points.at(i)->get_location(0) - sinks.at(0)->get_location(0), 2) + pow(points.at(i)->get_location(1) - sinks.at(0)->get_location(1), 2));
