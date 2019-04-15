@@ -10,6 +10,7 @@
 #include"Components.h"
 #include"Point.h"
 #include"Sink.h"
+#include"Cluster.h"
 
 using namespace std;
 int total_points, total_values;
@@ -21,14 +22,15 @@ private:
 	vector<Sink*>sinks;
 	vector<vector<Sink*>>groups1;
 	vector<vector<Sink*>>groups2;
+	vector<Cluster>clusters1;
+	vector<Cluster>clusters2;
 	int WCVnum = 0;
 	int UAVnum = 0;
-	//vector<Mobile_Device>vchicle;
 	double SleepTime;
 	int *budget;
 public:
 	Main(const char *argv, const char *argv2) {
-		int temp = 120000;
+		int temp = 10000;
 		double test = 0;
 		double limit = 6;
 		this->budget = &temp;
@@ -36,79 +38,25 @@ public:
 		sort(points.begin(), points.end(), cmp);
 		read_TopofileSink(argv);
 		BUY_Device(*budget, limit);
-		sort(sinks.begin(),sinks.end(),sort_consumption1);
-		
-		for (int i = 0; i < sinks.size(); i++) {
-			vector<Sink*>temp;
-			temp.push_back(sinks.at(i));
-			groups1.push_back(temp);
-		}
-		while (groups1.size() > WCVnum) {
-			if (groups1.size() <= WCVnum  )break;
-			Sink* closeSink = groups1.at(0).at(0);
-			double temp = 10e10;
-			int count = 0;
-			for (int j = 1; j < groups1.size(); j++) {
-				double temp_s = sqrt(pow(groups1.at(0).at(0)->get_location(0) - groups1.at(j).at(0)->get_location(0), 2) + pow(groups1.at(0).at(0)->get_location(1) - groups1.at(j).at(0)->get_location(1), 2));
-				if (temp_s < temp) {
-					temp = temp_s;
-					closeSink = groups1.at(j).at(0);
-					count = j;
-				}
-			}
-			groups1.at(0).push_back(closeSink);
-			groups1.erase(groups1.begin()+count);
-			sort(groups1.begin(),groups1.end(), sort_groups1);
-		}
-		
-		sort(sinks.begin(), sinks.end(), sort_consumption2);
-		for (int i = 0; i < sinks.size(); i++) {
-			vector<Sink*>temp;
-			temp.push_back(sinks.at(i));
-			groups2.push_back(temp);
-		}
-		while (groups2.size() > UAVnum) {
-			if (groups2.size() <= UAVnum)break;
-			Sink* closeSink = groups2.at(0).at(0);
-			double temp = 10e10;
-			int count = 0;
-			for (int j = 1; j < groups2.size(); j++) {
-				double temp_s = sqrt(pow(groups2.at(0).at(0)->get_location(0) - groups2.at(j).at(0)->get_location(0), 2) + pow(groups2.at(0).at(0)->get_location(1) - groups2.at(j).at(0)->get_location(1), 2));
-				if (temp_s < temp) {
-					temp = temp_s;
-					closeSink = groups2.at(j).at(0);
-					count = j;
-				}
-			}
-			groups2.at(0).push_back(closeSink);
-			groups2.erase(groups2.begin() + count);
-			sort(groups2.begin(), groups2.end(), sort_groups2);
-		}
-		for (int i = 0; i < groups1.size(); i++) {
-			for(int j=0;j<)
-		}
-  		double groups_consumption1=7200*6;
-		double groups_consumption2=7200*6;
-		for (int i = 0; i < groups1.size(); i++) {
-			for (int j = 0; j < groups1.size(); j++) {
-				if (i == j)
-					continue;
+		merge();
 				
-				double dist=sqrt(pow(sinks.at(i)->get_location(0) - sinks.at(j)->get_location(0), 2) + pow(sinks.at(i)->get_location(1) - sinks.at(j)->get_location(1), 2));
-				
-			}
-		}
 		//Consumption(1);
+		
 		for (int k = 0; k < 360; k++) {
 			for (int j = 0; j < 4; j++) {
-				for (int i = 0; i < sinks.size(); i++) {
+				for (int i = 0; i < clusters1.size(); i++) {
 					//cout << "Sink " << i << endl;
-					SleepTime += sinks.at(i)->Assign_task(limit);
+					SleepTime += clusters1.at(i).Assign_task(limit);
 					//SleepTime+=sinks.at(i)->cycle_Charging();
-					SleepTime += sinks.at(i)->cal_other_points_time(limit);
-					if (SleepTime != 0) {
-						cout << sinks.at(i) << endl;
-					}
+					SleepTime += clusters1.at(i).cal_other_points_time(limit);
+				
+				};
+				for (int i = 0; i < clusters2.size(); i++) {
+					//cout << "Sink " << i << endl;
+					SleepTime += clusters2.at(i).Assign_task(limit);
+					//SleepTime+=sinks.at(i)->cycle_Charging();
+					SleepTime += clusters2.at(i).cal_other_points_time(limit);
+					
 				};
 				//cout << "1¤p®Éµ²§ô¡ASleetTime:" << SleepTime << endl;
 				//
@@ -149,6 +97,84 @@ public:
 			temp_s += b.at(i)->revise_Totaltype2_consumption();
 		}
 		return temp < temp_s;
+	}
+	void merge() {
+		
+		sort(sinks.begin(), sinks.end(), sort_consumption1);
+
+		for (int i = 0; i < sinks.size(); i++) {
+			vector<Sink*>temp;
+			temp.push_back(sinks.at(i));
+			groups1.push_back(temp);
+		}
+		while (groups1.size() > WCVnum) {
+			if (groups1.size()== 1)break;
+			if (groups1.size() <= WCVnum)break;
+			//if (WCVnum = 0)break;
+			Sink* closeSink = groups1.at(0).at(0);
+			double temp = 10e10;
+			int count = 0;
+			for (int j = 1; j < groups1.size(); j++) {
+				double temp_s = sqrt(pow(groups1.at(0).at(0)->get_location(0) - groups1.at(j).at(0)->get_location(0), 2) + pow(groups1.at(0).at(0)->get_location(1) - groups1.at(j).at(0)->get_location(1), 2));
+				if (temp_s < temp) {
+					temp = temp_s;
+					closeSink = groups1.at(j).at(0);
+					count = j;
+				}
+			}
+			for (int i = 0; i < groups1.at(count).size(); i++) {
+				groups1.at(0).push_back(groups1.at(count).at(i));
+			}
+			
+			groups1.erase(groups1.begin() + count);
+			sort(groups1.begin(), groups1.end(), sort_groups1);
+		}
+
+		sort(sinks.begin(), sinks.end(), sort_consumption2);
+		for (int i = 0; i < sinks.size(); i++) {
+			vector<Sink*>temp;
+			temp.push_back(sinks.at(i));
+			groups2.push_back(temp);
+		}
+		while (groups2.size() > UAVnum) {
+			if (groups2.size() == 1)break;
+			if (groups2.size() <= UAVnum)break;
+			//if (UAVnum = 0)break;
+			Sink* closeSink = groups2.at(0).at(0);
+			double temp = 10e10;
+			int count = 0;
+			for (int j = 1; j < groups2.size(); j++) {
+				double temp_s = sqrt(pow(groups2.at(0).at(0)->get_location(0) - groups2.at(j).at(0)->get_location(0), 2) + pow(groups2.at(0).at(0)->get_location(1) - groups2.at(j).at(0)->get_location(1), 2));
+				if (temp_s < temp) {
+					temp = temp_s;
+					closeSink = groups2.at(j).at(0);
+					count = j;
+				}
+			}
+			for (int i = 0; i < groups2.at(count).size(); i++) {
+				groups2.at(0).push_back(groups2.at(count).at(i));
+			}
+			groups2.erase(groups2.begin() + count);
+			sort(groups2.begin(), groups2.end(), sort_groups2);
+		}
+
+		for (int i = 0; i < groups1.size(); i++) {
+			for (int j = 0; j < groups1.size(); j++) {
+				if (i == j)
+					continue;
+
+				double dist = sqrt(pow(sinks.at(i)->get_location(0) - sinks.at(j)->get_location(0), 2) + pow(sinks.at(i)->get_location(1) - sinks.at(j)->get_location(1), 2));
+
+			}
+		}
+		for (int i = 0; i < groups1.size(); i++) {
+			Cluster Type1(groups1.at(i), 0,WCVnum,UAVnum);
+			clusters1.push_back(Type1);
+		}
+		for (int i = 0; i < groups2.size(); i++) {
+			Cluster Type2(groups2.at(i), 1, WCVnum, UAVnum);
+			clusters2.push_back(Type2);
+		}
 	}
 	void belong() {
 		for (int i = 0; i < points.size(); i++) {
@@ -205,7 +231,7 @@ public:
 			budget -= wcv.revise_price();
 			WCVnum++;
 		}
-			//cout << "cccc" << endl;
+			
 	
 	}
 	void read_TopofileSink(const char *fileName1) {

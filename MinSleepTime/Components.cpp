@@ -86,6 +86,11 @@ vector<Point*> Mobile_Device::get_QT() {
 	return this->QT;
 }
 
+void Mobile_Device::Add_NextEnergy(double Energy)
+{
+	this->NextEnergy.push_back(Energy);
+}
+
 
 
 

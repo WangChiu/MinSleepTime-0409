@@ -23,6 +23,10 @@ vector<Point*> Sink::get_points() {
 void Sink::set_points(Point &point) {
 	points.push_back(&point);
 }
+Point * Sink::get_point(int index)
+{
+	return this->points.at(index);
+}
 void Sink::Add_Device(int &budget,bool uavORwcv) {
 	
 	double x = this->get_location(0);

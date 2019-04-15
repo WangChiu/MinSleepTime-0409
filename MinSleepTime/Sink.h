@@ -25,6 +25,7 @@ public:
 	double get_location(int index);
 	vector<Point*> get_points();
 	void set_points(Point &point);
+	Point* get_point(int index);
 	void Add_Device(int &budset, bool uavORwcv);
 	double Assign_task(double limit);
 	double dist(double x1,double y1,double x2,double y2);

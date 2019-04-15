@@ -19,7 +19,8 @@ private:
 	double Charging_rate = 7200;  //充電率(J/h)
 	vector<Point*>points;//周圍節點
 	vector<Point*>QT;//周圍等待節點序列
-	vector<double>NextTime;//每段距離序列
+	vector<double>NextTime;//每段距離時間
+	vector<double>NextEnergy;//每段距離的能量
 	double cycle_Time;
 	
 public:
@@ -36,7 +37,7 @@ public:
 	void Add_points(Point &point);
 	void Add_QT(Point &point);
 	vector<Point*> get_QT();
-	//void reset_QT(bool uav_or_wcv);
+	void Add_NextEnergy(double Energy);
 	double Run_Charging(Point &point);
 	void Add_NextTime(double Time);
 	vector<double> get_NextTime();
