@@ -111,11 +111,25 @@ double Cluster::Assign_task(double limit) {
 			double NextPointReminTime = points.at(j)->revise_ReminingTime(0);
 			NextPointReminTime -= cycle_time;
 			cycle_time += TonextTime + TonextChargeTime;
-			if (cycle_time < NextPointReminTime && cycle_time <= limit && (MobileEnergy-TOnextEnergy-TonextChargeEnergy) <= 0) {
-				
+			if (cycle_time < NextPointReminTime && cycle_time <= limit && (MobileEnergy-TOnextEnergy-TonextChargeEnergy) > 0) {
+				MobileEnergy -=(TonextTime+TonextChargeTime) * points.at(j)->get_Energy_consumption();
+				double Energy=points.at(j)->revise_Energy(0);
+				Energy -= cycle_time * points.at(j)->get_Energy_consumption();
+				points.at(j)->revise_Energy(1,Energy);
+				TonextChargeEnergy = points.at(j)->get_TotalEnergy() - points.at(j)->revise_Energy();
+				TonextChargeTime = TonextChargeEnergy / points.at(j)->get_Nodecharge_rate();
+				filnalTime = dist(points.at(j)->get_location(0), points.at(j)->get_location(1), vehicle.at(i).get_location(0), vehicle.at(i).get_location(1)) / vehicle.at(i).revise_Speed();
+				vehicle.at(i).Add_QT(*points.at(j));
+				points.at(j)->revise_task(1, 1);
+				vehicle.at(i).Add_NextTime(TonextTime + TonextChargeTime);
 			}
-			
+			else {
+				vehicle.at(i).Add_NextTime(filnalTime);
+				break;
+			}
 		}
+		SleepTime += cycle_Charging();
+		return SleepTime;
 	}
 	/*for (int i = 0; i < vehicle.size(); i++) {
 		
@@ -191,12 +205,8 @@ double Cluster::cycle_Charging()
 		double time = 0;
 		for (int j = 0; j < this->vehicle.at(i).get_QT().size(); j++) {
 			vehicle.at(i).get_QT().at(j)->revise_Energy(1, vehicle.at(i).get_QT().at(j)->get_TotalEnergy());
-			for (int z = 0; z < points.size(); z++) {
-				cout << points.at(z)->getID() << "\t" << points.at(z)->revise_Energy() << "\t" << points.at(z)->revise_ReminingTime() << endl;
-			}
 			vehicle.at(i).get_QT().at(j)->revise_charging(1, 1);
 			vehicle.at(i).get_QT().at(j)->revise_task(1, 0);
-			double TravelTime = vehicle.at(i).get_NextTime().at(j);
 		}
 		vehicle.at(i).reset_QT();
 	}

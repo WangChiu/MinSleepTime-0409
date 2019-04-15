@@ -30,7 +30,7 @@ private:
 	int *budget;
 public:
 	Main(const char *argv, const char *argv2) {
-		int temp = 10000;
+		int temp = 30000;
 		double test = 0;
 		double limit = 6;
 		this->budget = &temp;
@@ -44,22 +44,14 @@ public:
 		
 		for (int k = 0; k < 360; k++) {
 			for (int j = 0; j < 4; j++) {
-				for (int i = 0; i < clusters1.size(); i++) {
-					//cout << "Sink " << i << endl;
+				for (int i = 0; i < clusters1.size(); i++) {			
 					SleepTime += clusters1.at(i).Assign_task(limit);
-					//SleepTime+=sinks.at(i)->cycle_Charging();
 					SleepTime += clusters1.at(i).cal_other_points_time(limit);
-				
 				};
 				for (int i = 0; i < clusters2.size(); i++) {
-					//cout << "Sink " << i << endl;
 					SleepTime += clusters2.at(i).Assign_task(limit);
-					//SleepTime+=sinks.at(i)->cycle_Charging();
-					SleepTime += clusters2.at(i).cal_other_points_time(limit);
-					
+					SleepTime += clusters2.at(i).cal_other_points_time(limit);	
 				};
-				//cout << "1小時結束，SleetTime:" << SleepTime << endl;
-				//
 			};
 			cout << k << "天結束，SleetTime:" << SleepTime << endl;
 		};
