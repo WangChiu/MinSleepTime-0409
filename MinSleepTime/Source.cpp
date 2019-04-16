@@ -30,7 +30,12 @@ private:
 	int *budget;
 public:
 	Main(const char *argv, const char *argv2) {
-		int temp = 30000;
+		int temp = 0;
+		ifstream ReadBudget;
+		string BudgetName = "Budget.txt";// "Sink_Topolist.txt";
+		ReadBudget.open(BudgetName.c_str(), ios::in);
+		ReadBudget >> temp;
+		
 		double test = 0;
 		double limit = 6;
 		this->budget = &temp;
@@ -39,9 +44,7 @@ public:
 		read_TopofileSink(argv);
 		BUY_Device(*budget, limit);
 		merge();
-				
-		//Consumption(1);
-		
+	
 		for (int k = 0; k < 360; k++) {
 			for (int j = 0; j < 4; j++) {
 				for (int i = 0; i < clusters1.size(); i++) {			
@@ -324,5 +327,5 @@ int main(int argc,char *argv[])
 	Main mo(filename1, filename2);
 	
 	return 0;
-
+	system("pause");
 }

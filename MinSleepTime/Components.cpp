@@ -132,7 +132,7 @@ UAV::UAV(double x, double y)
 	this->revise_price(1, 40000);
 	this->set_TotalBattery(45000);
 	this->revise_Battery(1,45000);
-	this->revise_Speed(1, 10);
+	this->revise_Speed(1, 5);
 	this->set_location(x, y);
 
 }
@@ -142,7 +142,7 @@ WCV::WCV(double x, double y)
 	this->revise_price(1, 10000);
 	this->set_TotalBattery(180000);
 	this->revise_Battery(1,180000);
-	this->revise_Speed(1,5);
+	this->revise_Speed(1,1);
 	this->set_location(x,y);
 
 	
